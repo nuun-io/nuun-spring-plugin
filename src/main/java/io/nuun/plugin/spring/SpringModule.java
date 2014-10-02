@@ -65,16 +65,18 @@ class SpringModule extends AbstractModule
     @Override
     protected void configure()
     {
-        this.beanDefinitions = new HashMap<Class<?>, Map<String, SpringBeanDefinition>>();
+        beanDefinitions = new HashMap<Class<?>, Map<String, SpringBeanDefinition>>();
         bindFromApplicationContext();
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({
+            "unchecked", "rawtypes"
+    })
     private void bindFromApplicationContext()
     {
         boolean debugEnabled = logger.isDebugEnabled();
 
-        ConfigurableListableBeanFactory currentBeanFactory = this.beanFactory;
+        ConfigurableListableBeanFactory currentBeanFactory = beanFactory;
         do
         {
             for (String beanName : currentBeanFactory.getBeanDefinitionNames())
@@ -97,27 +99,36 @@ class SpringModule extends AbstractModule
                     // Adding bean with its parent type if enabled
                     Class<?> parentClass = beanClass.getSuperclass();
                     if (parentClass != null && parentClass != Object.class)
+                    {
                         addBeanDefinition(parentClass, springBeanDefinition);
+                    }
 
                     // Adding bean with its immediate interfaces if enabled
                     for (Class<?> i : beanClass.getInterfaces())
+                    {
                         addBeanDefinition(i, springBeanDefinition);
+                    }
                 }
             }
             BeanFactory factory = currentBeanFactory.getParentBeanFactory();
             if (factory != null) {
                 if (factory instanceof ConfigurableListableBeanFactory)
+                {
                     currentBeanFactory = (ConfigurableListableBeanFactory)factory;
+                }
                 else {
                     logger.info("Cannot go up further in the bean factory hierarchy, parent bean factory doesn't implement ConfigurableListableBeanFactory");
                     currentBeanFactory = null;
                 }
-            } else
+            }
+            else
+            {
                 currentBeanFactory = null;
+            }
         }
         while (currentBeanFactory != null);
 
-        for (Map.Entry<Class<?>, Map<String, SpringBeanDefinition>> entry : this.beanDefinitions.entrySet())
+        for (Map.Entry<Class<?>, Map<String, SpringBeanDefinition>> entry : beanDefinitions.entrySet())
         {
             Class<?> type = entry.getKey();
             Map<String, SpringBeanDefinition> definitions = entry.getValue();
@@ -126,7 +137,9 @@ class SpringModule extends AbstractModule
             for (SpringBeanDefinition candidate : definitions.values())
             {
                 if (debugEnabled)
+                {
                     logger.info("Binding spring bean " + candidate.getName() + " by name and type " + type.getCanonicalName());
+                }
 
                 bind(type).annotatedWith(Names.named(candidate.getName())).toProvider(
                         new ByNameSpringContextProvider(type, candidate.getName(), candidate.getBeanFactory()));
@@ -136,12 +149,16 @@ class SpringModule extends AbstractModule
 
     private void addBeanDefinition(Class<?> beanClass, SpringBeanDefinition springBeanDefinition)
     {
-        Map<String, SpringBeanDefinition> beansOfType = this.beanDefinitions.get(beanClass);
+        Map<String, SpringBeanDefinition> beansOfType = beanDefinitions.get(beanClass);
         if (beansOfType == null)
-            this.beanDefinitions.put(beanClass, beansOfType = new HashMap<String, SpringBeanDefinition>());
+        {
+            beanDefinitions.put(beanClass, beansOfType = new HashMap<String, SpringBeanDefinition>());
+        }
 
-        if (!beansOfType.containsKey(springBeanDefinition.getName())) // TODO determine which beans override which in spring semantics ? Here first discovered wins...
+        if (!beansOfType.containsKey(springBeanDefinition.getName()))
+        {
             beansOfType.put(springBeanDefinition.getName(), springBeanDefinition);
+        }
     }
 
     private Class<?> classFromString(String className)

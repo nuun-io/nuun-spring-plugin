@@ -16,9 +16,10 @@
  */
 package io.nuun.plugin.spring;
 
+import static io.nuun.kernel.core.NuunCore.createKernel;
+import static io.nuun.kernel.core.NuunCore.newKernelConfiguration;
 import static org.fest.assertions.Assertions.assertThat;
-import io.nuun.kernel.core.Kernel;
-import io.nuun.plugin.spring.SpringPlugin;
+import io.nuun.kernel.api.Kernel;
 import io.nuun.plugin.spring.sample.AbstractService2;
 import io.nuun.plugin.spring.sample.Service1;
 import io.nuun.plugin.spring.sample.Service1Internal;
@@ -44,10 +45,16 @@ public class SpringPluginTest {
     @BeforeClass
     @SuppressWarnings("unchecked")
     public static void setup() {
-        kernel = Kernel.createKernel()
+        
+        kernel = createKernel(
+                //
+                newKernelConfiguration() //
                 .withoutSpiPluginsLoader()
-                .withPlugins(UsingSpringAsDIPlugin.class, SpringPlugin.class)
-                .build();
+                .plugins(UsingSpringAsDIPlugin.class, SpringPlugin.class)
+                
+                
+
+                );
 
         kernel.init();
         kernel.start();
