@@ -16,7 +16,7 @@
  */
 package io.nuun.plugin.spring;
 
-import io.nuun.kernel.api.plugin.AbstractPlugin;
+import io.nuun.kernel.core.AbstractPlugin;
 import io.nuun.plugin.spring.sample.Service3Internal;
 
 import org.springframework.beans.factory.support.GenericBeanDefinition;
