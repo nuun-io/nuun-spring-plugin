@@ -16,7 +16,9 @@
  */
 package io.nuun.plugin.spring;
 
+import io.nuun.kernel.api.di.UnitModule;
 import io.nuun.kernel.api.plugin.PluginException;
+import io.nuun.kernel.core.internal.ModuleEmbedded;
 import io.nuun.kernel.spi.DependencyInjectionProvider;
 
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
@@ -33,12 +35,12 @@ class InternalDependencyInjectionProvider implements DependencyInjectionProvider
     }
 
     @Override
-    public Module convert(Object injectionDefinition)
+    public UnitModule convert(Object injectionDefinition)
     {
         if (injectionDefinition instanceof ConfigurableListableBeanFactory)
-            return new SpringModule((ConfigurableListableBeanFactory)injectionDefinition);
+            return ModuleEmbedded.wrap(new SpringModule((ConfigurableListableBeanFactory)injectionDefinition));
         else if (injectionDefinition instanceof ConfigurableApplicationContext)
-            return new SpringModule(((ConfigurableApplicationContext)injectionDefinition).getBeanFactory());
+            return ModuleEmbedded.wrap(new SpringModule(((ConfigurableApplicationContext)injectionDefinition).getBeanFactory()));
         else
             throw new PluginException("Only ConfigurableListableBeanFactory or ConfigurableApplicationContext types are handled");
     }

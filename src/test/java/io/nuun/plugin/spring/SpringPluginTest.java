@@ -60,7 +60,7 @@ public class SpringPluginTest {
         kernel.start();
 
         // add a second guice-only implementation of Service1
-        injector = kernel.getObjectGraph().as(Injector.class).createChildInjector(new AbstractModule() {
+        injector = kernel.objectGraph().as(Injector.class).createChildInjector(new AbstractModule() {
             @Override
             protected void configure() {
                 bind(Service1.class).to(Service1InternalBis.class);

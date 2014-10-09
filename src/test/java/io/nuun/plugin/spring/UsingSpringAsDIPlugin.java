@@ -16,6 +16,7 @@
  */
 package io.nuun.plugin.spring;
 
+import io.nuun.kernel.api.di.UnitModule;
 import io.nuun.kernel.core.AbstractPlugin;
 import io.nuun.plugin.spring.sample.Service3Internal;
 
@@ -33,8 +34,7 @@ public class UsingSpringAsDIPlugin extends AbstractPlugin
     }
     
     
-    @Override
-    public Object dependencyInjectionDef()
+    public Object nativeUnitModule()
     {
         ClassPathXmlApplicationContext parentCtx = new  ClassPathXmlApplicationContext("context.xml");
         
