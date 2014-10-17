@@ -24,8 +24,6 @@ import io.nuun.kernel.spi.DependencyInjectionProvider;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 
-import com.google.inject.Module;
-
 class InternalDependencyInjectionProvider implements DependencyInjectionProvider
 {
     @Override
@@ -35,14 +33,20 @@ class InternalDependencyInjectionProvider implements DependencyInjectionProvider
     }
 
     @Override
-    public UnitModule convert(Object injectionDefinition)
+    public UnitModule convert(Object nativeUnitModule)
     {
-        if (injectionDefinition instanceof ConfigurableListableBeanFactory)
-            return ModuleEmbedded.wrap(new SpringModule((ConfigurableListableBeanFactory)injectionDefinition));
-        else if (injectionDefinition instanceof ConfigurableApplicationContext)
-            return ModuleEmbedded.wrap(new SpringModule(((ConfigurableApplicationContext)injectionDefinition).getBeanFactory()));
+        if (nativeUnitModule instanceof ConfigurableListableBeanFactory)
+        {
+            return ModuleEmbedded.wrap(new SpringModule((ConfigurableListableBeanFactory)nativeUnitModule));
+        }
+        else if (nativeUnitModule instanceof ConfigurableApplicationContext)
+        {
+            return ModuleEmbedded.wrap(new SpringModule(((ConfigurableApplicationContext)nativeUnitModule).getBeanFactory()));
+        }
         else
+        {
             throw new PluginException("Only ConfigurableListableBeanFactory or ConfigurableApplicationContext types are handled");
+        }
     }
 
     @Override
